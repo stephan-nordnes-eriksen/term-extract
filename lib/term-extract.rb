@@ -23,6 +23,8 @@ class TermExtract
     @min_occurance = options.key?(:min_occurance) ? options.delete(:min_occurance) : 3
     # Always include multiword terms that comprise more than @min_terms words
     @min_terms = options.key?(:min_terms) ? options.delete(:min_terms) : 2
+    # Remove terms that comprise of more than @max_terms
+    @max_terms = options.key?(:max_terms) ? options.delete(:max_terms) : 5
     # Extract proper nouns (:nnp) or nouns (:nn) or both (:all)
     @types = options.key?(:types) ? options.delete(:types) : :all
     # Include the extracted POS tags in the results
@@ -96,8 +98,8 @@ class TermExtract
     terms.each_key do |term|
       occur = terms[term][:occurances]
       strength = term.split(/ /).length
-      terms.delete(term) if occur < 1
-      terms.delete(term) unless ((strength == 1 and occur >= @min_occurance) or (strength >= @min_terms))
+      terms.delete(term) if occur < 1 or strength > @max_terms
+      terms.delete(term) unless (strength == 1 and occur >= @min_occurance) or (strength >= @min_terms)
     end
 
     # Remove shorter terms that form part of larger terms
