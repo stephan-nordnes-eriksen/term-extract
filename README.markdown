@@ -2,7 +2,7 @@
 
 ## Description:
 
-    This is a modified version that aims to give the user more control over which terms are accepted and rejected. 
+    This is a modified version that aims to give the user more control over which terms are accepted and rejected. Installation description is for original gem and not this modified version.
 
 term_extract extracts proper nouns (named things like 'Manchester United') and ordinary nouns (like 'event') from text documents.
 
