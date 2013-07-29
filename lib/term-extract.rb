@@ -10,7 +10,7 @@ class TermExtract
 
   @@TAGGER = Brill::Tagger.new
 
-  attr_accessor :min_occurance, :min_terms, :types, :include_tags, :lazy
+  attr_accessor :min_occurance, :types, :include_tags, :lazy, :terms_min, :terms_max, :terms_range
 
   # Provide a class method for syntactic sugar
   def self.extract(content, options = {})
@@ -21,10 +21,12 @@ class TermExtract
   def initialize(options = {})
     # The minimum number of times a single word term must occur to be included in the results
     @min_occurance = options.key?(:min_occurance) ? options.delete(:min_occurance) : 3
-    # Always include multiword terms that comprise more than @min_terms words
-    @min_terms = options.key?(:min_terms) ? options.delete(:min_terms) : 2
-    # Remove terms that comprise of more than @max_terms
-    @max_terms = options.key?(:max_terms) ? options.delete(:max_terms) : 5
+    # Always include multiword terms that comprise more than @terms_min words
+    @terms_min = options.key?(:terms_min) ? options.delete(:terms_min) : 2
+    # Remove terms that comprise of more than @terms_max
+    @terms_max = options.key?(:terms_max) ? options.delete(:terms_max) : 5
+    # Remove terms that are outside of range
+    @terms_range = options.key?(:terms_range) ? options.delete(:terms_range) : false
     # Extract proper nouns (:nnp) or nouns (:nn) or both (:all)
     @types = options.key?(:types) ? options.delete(:types) : :all
     # Include the extracted POS tags in the results
@@ -97,9 +99,15 @@ class TermExtract
     # correct)
     terms.each_key do |term|
       occur = terms[term][:occurances]
-      strength = term.split(/ /).length
-      terms.delete(term) if occur < 1 or strength > @max_terms
-      terms.delete(term) unless (strength == 1 and occur >= @min_occurance) or (strength >= @min_terms)
+      terms_length = term.split(/ /).length
+      if @terms_range
+        if not @terms_range.member?(terms_length)
+          terms.delete(term)
+        end
+      elsif (occur < 1 or terms_length > @terms_max or terms_length < @terms_min)
+        terms.delete(term) 
+      end
+      #terms.delete(term) unless (terms_length == 1 and occur >= @min_occurance)
     end
 
     # Remove shorter terms that form part of larger terms
