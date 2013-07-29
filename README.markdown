@@ -2,8 +2,19 @@
 
 ## Description:
 
+    This is a modified version that aims to give the user more control over which terms are accepted and rejected. 
+
 term_extract extracts proper nouns (named things like 'Manchester United') and ordinary nouns (like 'event') from text documents.
 
+## Install:
+
+    gem install term-extract
+
+or with bundler:
+
+    #Gemfile:
+    gem 'term-extract'
+    
 ## Usage:
 
 An example extracting terms from a piece of content:
@@ -21,8 +32,10 @@ An example extracting terms from a piece of content:
 
 The #extract method takes an (optional) options hash, that allows the term extractor behaviour to be modified.  The following options are available:
 
-* min_occurance - The minimum number of times a single word term must occur to be included in the results, default 3
-* min_terms - Always include multiword terms that comprise more than @min_terms words, default 2
+* occurance_min - The minimum number of times a single word term must occur to be included in the results, default 3
+* terms_min - Set the minimum amaunt of words in a terms, default 2
+* terms_max - Set the maximum amaunt of words in a terms, default 5
+* terms_range - Set a range (eg. 2..9) for the amaunt of allowed words in the terms, default false (terms_range overrides terms_min and terms_max)
 * types - Extract proper nouns (:nnp) or nouns (:nn) or both (:all), default :all
 * include_tags - Include the extracted POS tags in the results, default false
 * collapse_terms - Remove shorter terms that are part of larger ones, default true
