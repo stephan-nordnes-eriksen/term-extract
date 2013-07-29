@@ -10,7 +10,7 @@ class TermExtract
 
   @@TAGGER = Brill::Tagger.new
 
-  attr_accessor :min_occurance, :types, :include_tags, :lazy, :terms_min, :terms_max, :terms_range
+  attr_accessor :occurance_min, :types, :include_tags, :lazy, :terms_min, :terms_max, :terms_range
 
   # Provide a class method for syntactic sugar
   def self.extract(content, options = {})
@@ -20,7 +20,7 @@ class TermExtract
 
   def initialize(options = {})
     # The minimum number of times a single word term must occur to be included in the results
-    @min_occurance = options.key?(:min_occurance) ? options.delete(:min_occurance) : 3
+    @occurance_min = options.key?(:occurance_min) ? options.delete(:occurance_min) : 3
     # Always include multiword terms that comprise more than @terms_min words
     @terms_min = options.key?(:terms_min) ? options.delete(:terms_min) : 2
     # Remove terms that comprise of more than @terms_max
@@ -95,7 +95,7 @@ class TermExtract
 
     # Filter out terms that don't meet minimum requirements
     # It's possible for a term with multiple words to be returned even if it doesn't
-    # meet the min_occurance requirements (as a multiterm noun is very likely to be
+    # meet the occurance_min requirements (as a multiterm noun is very likely to be
     # correct)
     terms.each_key do |term|
       occur = terms[term][:occurances]
@@ -104,10 +104,10 @@ class TermExtract
         if not @terms_range.member?(terms_length)
           terms.delete(term)
         end
-      elsif (occur < 1 or terms_length > @terms_max or terms_length < @terms_min)
+      elsif occur < @occurances_min or terms_length > @terms_max or terms_length < @terms_min
         terms.delete(term) 
       end
-      #terms.delete(term) unless (terms_length == 1 and occur >= @min_occurance)
+      #terms.delete(term) unless (terms_length == 1 and occur >= @occurance_min)
     end
 
     # Remove shorter terms that form part of larger terms
